@@ -26,6 +26,22 @@ int main() {
     ll n; cin >> n;
     vector<ll> answers(n + 1);
 
-    cout << num(n, answers);
+    // cout << num(n, answers);
+
+    for (int i = 1; i <= n; i++) {
+        if (i <= 6) {
+            answers[i] = 1LL << (i-1);
+        } else {
+            ll sum = 0;
+            for (int j = 1; j <= 6; j++) {
+                sum += answers[i-j]; 
+                sum %= (ll) 1e9 + 7;
+            }
+            answers[i] = sum;
+        }
+    }
+
+    cout << answers.back();
+
     return 0;
 }
