@@ -6,6 +6,7 @@ using namespace std;
 ll modulo = 1e9 + 7;
 
 ll combinations(ll x, vector<ll> &denominations, vector<ll> &answers) {
+    // top down approach, too slow
     if (x < 0) {
         return 0;
     } else if (x == 0) {
@@ -15,14 +16,9 @@ ll combinations(ll x, vector<ll> &denominations, vector<ll> &answers) {
     } else {
         ll cumsum = 0;
         for (int i = 0; i < denominations.size(); i++) {
-            ll current = denominations[i];
-            if (x < current) {
-                continue;
-            } else {
-                ll remaining = x - current;
-                cumsum += combinations(remaining, denominations, answers);
-                cumsum %= modulo;
-            }
+            ll remaining = x - denominations[i];
+            cumsum += combinations(remaining, denominations, answers);
+            cumsum %= modulo;
         }
 
         answers[x] = cumsum;
@@ -34,16 +30,31 @@ int main() {
     ll n, x; cin >> n; cin >> x;
 
     vector<ll> denominations;
-    vector<ll> answers(x+1, -1);
-    ll minimum = numeric_limits<int>::max();
+    vector<ll> answers(x+1, 0);
     for (int i = 0; i < n; i++) {
         ll input; cin >> input;
-        minimum = min(input, minimum);
         denominations.push_back(input);
     }
-    answers[minimum] = 1; answers[0] = 1;
+
+    sort(denominations.begin(), denominations.end());
+    answers[0] = 1;
     
-    cout << combinations(x, denominations, answers);
+    // bottom up approach
+    for (int i = 1; i <= x; i++) {
+        ll sum = 0;
+        for (int j = 0; j < n; j++) {
+            ll coin = denominations[j];
+            if (coin > i) {
+                break;
+            }
+
+            sum += answers[i - coin];
+        }
+
+        answers[i] += sum % modulo;
+    }
+
+    cout << answers[x];
 
     return 0;
 }
